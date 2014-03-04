@@ -1,0 +1,72 @@
+
+from gi.repository import GLib
+from zeitgeist.client import ZeitgeistClient
+from zeitgeist.datamodel import *
+
+import time
+import sys
+
+zeitgeist = ZeitgeistClient()
+
+def on_status_changed_callback(enabled):
+    """ This method will be called whenever someone enables or disables
+        the data-source. """
+    if enabled:
+        print 'Data-source enabled and ready to send events!'
+    else:
+        print 'Data-source disabled; don\'t send event, they\'ll be ignored.'
+ 
+def register():
+    # Always use the same unique_id. Name and description can change
+    # freely.
+    unique_id = 'sublime-text.data.source'
+    name = 'sublime-text data source'
+    description = 'sublime-text data source'
+ 
+    # Describe what sort of events will be inserted (optional)
+    subject_template = Subject()
+    subject_template.interpretation = Interpretation.PLAIN_TEXT_DOCUMENT
+    subject_template.manifestation = Manifestation.FILE_DATA_OBJECT
+    templates = []
+    for interp in (Interpretation.ACCESS_EVENT, Interpretation.LEAVE_EVENT):
+        event_template = Event()
+        event_template.interpretation = interp
+        event_template.manifestation = Manifestation.USER_ACTIVITY
+        event_template.append_subject(subject_template)
+        templates.append(event_template)
+ 
+    zeitgeist.register_data_source(unique_id, name, description, templates,
+                                   on_status_changed_callback)
+
+def log(title, uri, opened):
+    subject = Subject.new_for_values(
+        uri=uri,
+        interpretation=Interpretation.PLAIN_TEXT_DOCUMENT,
+        manifestation=Manifestation.FILE_DATA_OBJECT,
+        origin=GLib.path_get_dirname(uri),
+        mimetype='text/plain',
+        text=title)
+    event = Event.new_for_values(
+        timestamp=time.time()*1000,
+        manifestation=Manifestation.USER_ACTIVITY,
+        actor='application://sublime-text-2.desktop',
+        subjects=[subject])
+    if opened:
+        event.interpretation = Interpretation.ACCESS_EVENT
+    else:
+        event.interpretation = Interpretation.LEAVE_EVENT
+ 
+    def on_id_received(event_ids):
+        print 'Logged %s (%d) with event id %d.' % (title, opened, event_ids[0])
+    
+    print 'Logging event %s - %s' % (title, uri)
+    zeitgeist.insert_events([event], on_id_received)
+
+if __name__ == '__main__':
+	register()
+
+	title =  sys.argv[1]
+	uri = 'file://' + sys.argv[2]
+	
+	log(title, uri, True)
+
