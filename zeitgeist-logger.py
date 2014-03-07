@@ -1,3 +1,4 @@
+#!/usr/bin/env python2.7
 
 from gi.repository import GLib
 from zeitgeist.client import ZeitgeistClient
