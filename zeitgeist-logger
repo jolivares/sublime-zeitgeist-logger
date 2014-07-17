@@ -13,9 +13,9 @@ def on_status_changed_callback(enabled):
     """ This method will be called whenever someone enables or disables
         the data-source. """
     if enabled:
-        print 'Data-source enabled and ready to send events!'
+        print('Data-source enabled and ready to send events!')
     else:
-        print 'Data-source disabled; don\'t send event, they\'ll be ignored.'
+        print('Data-source disabled; don\'t send event, they\'ll be ignored.')
  
 def register():
     # Always use the same unique_id. Name and description can change
@@ -58,16 +58,16 @@ def log(title, uri, opened):
         event.interpretation = Interpretation.LEAVE_EVENT
  
     def on_id_received(event_ids):
-        print 'Logged %s (%d) with event id %d.' % (title, opened, event_ids[0])
+        print('Logged %s (%d) with event id %d.' % (title, opened, event_ids[0]))
     
-    print 'Logging event %s - %s' % (title, uri)
+    print('Logging event %s - %s' % (title, uri))
     zeitgeist.insert_events([event], on_id_received)
 
 if __name__ == '__main__':
-	register()
+    register()
 
-	title =  sys.argv[1]
-	uri = 'file://' + sys.argv[2]
-	
-	log(title, uri, True)
+    title =  sys.argv[1]
+    uri = 'file://' + sys.argv[2]
+    
+    log(title, uri, True)
 

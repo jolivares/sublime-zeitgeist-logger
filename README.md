@@ -1,7 +1,7 @@
 sublime-zeitgeist-logger
 ========================
 
-Sublime Text 2 plugin which logs events to [Zeitgeist](https://launchpad.net/gnome-activity-journal)
+Sublime Text 2/3 plugin which logs events to [Zeitgeist](https://launchpad.net/gnome-activity-journal)
 
 It's targeted to linux platforms and requires the following:
  
