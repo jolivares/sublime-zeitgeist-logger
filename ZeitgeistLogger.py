@@ -8,9 +8,9 @@ def _log_file(view):
 	if view.file_name() != None:
 		name = basename(view.file_name())
 		uri = view.file_name()
-		
+
 		print("name: %s file_name: %s " % (name, uri))
-		
+
 		out = subprocess.Popen([_load_CMD(), name, uri],
 								stdout=subprocess.PIPE).communicate()[0]
 		print("zeitgeist-logger outcome: %s" % out)
@@ -18,8 +18,8 @@ def _log_file(view):
 def _load_CMD():
 	working_path = join(abspath(dirname(__file__)), LOGGER_CMD)
 	default_path = join(sublime.packages_path(), 'ZeitgeistLogger', LOGGER_CMD)
-	installed_path = join(sublime.packages_path(), 'ZeitgeistLogger', LOGGER_CMD)	
-	
+	installed_path = join(sublime.packages_path(), 'ZeitgeistLogger', LOGGER_CMD) 
+
 	if os.path.isfile(default_path):
 		return default_path
 	elif os.path.isfile(installed_path):
@@ -31,5 +31,8 @@ def _load_CMD():
 
 class ZeitgeistPlugin(sublime_plugin.EventListener):
 	def on_load(self, view):
+		t = threading.Thread(target=_log_file, args=(view,), kwargs={})
+		t.start()
+	def on_post_save(self, view):
 		t = threading.Thread(target=_log_file, args=(view,), kwargs={})
 		t.start()
