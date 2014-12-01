@@ -3,9 +3,11 @@ import os, sys, subprocess, threading
 from os.path import basename, abspath, dirname, join
 
 LOGGER_CMD = 'zeitgeist-logger'
+LOGGED_FLAG = 'logged-to-zeitgeist'
 
 def _log_file(view):
-	if view.file_name() != None:
+	print("Flag " + view.get_status(LOGGED_FLAG))
+	if view.file_name() != None and view.get_status(LOGGED_FLAG) == None:		
 		name = basename(view.file_name())
 		uri = view.file_name()
 		
@@ -13,6 +15,7 @@ def _log_file(view):
 		
 		out = subprocess.Popen([_load_CMD(), name, uri],
 								stdout=subprocess.PIPE).communicate()[0]
+		view.set_status(LOGGED_FLAG, 'OK')
 		print("zeitgeist-logger outcome: %s" % out)
 
 def _load_CMD():
